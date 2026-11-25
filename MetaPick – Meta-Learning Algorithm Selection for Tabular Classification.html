@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MetaPick – Meta-Learning Algorithm Selection for Tabular Classification</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#060a1c;--bg2:#0d1333;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.14);--tx:#e9edff;--mu:#a3acd4;--v:#7c5cff;--c:#22d3ee;--m:#ff4fd8;--g:#34d399;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){color-scheme:dark}}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;font:16px/1.65 Inter,system-ui,sans-serif;color:var(--tx);background:radial-gradient(900px 500px at 15% -5%,#2b1d7a55,transparent),radial-gradient(800px 500px at 90% 10%,#0e749044,transparent),var(--bg);min-height:100vh}
+h1,h2,h3{font-family:Sora,system-ui,sans-serif;line-height:1.15;margin:0}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1080px;margin:auto;padding:0 22px}
+nav{position:sticky;top:0;z-index:20;backdrop-filter:blur(14px);background:#060a1cb8;border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
+.logo{font:800 20px Sora;letter-spacing:.5px}.logo b{background:linear-gradient(90deg,var(--c),var(--m));-webkit-background-clip:text;color:transparent}
+nav ul{display:flex;gap:22px;list-style:none;margin:0;padding:0;font-size:14px;color:var(--mu)}
+nav ul a:hover{color:#fff}
+@media(max-width:700px){nav ul{display:none}}
+/* glossy buttons */
+.btn{position:relative;display:inline-block;overflow:hidden;border:0;cursor:pointer;color:#fff;font:600 15px Sora;padding:14px 28px;border-radius:999px;
+background:linear-gradient(180deg,#a58bff 0%,#7c5cff 48%,#5b34e6 52%,#7a4dff 100%);
+box-shadow:inset 0 1px 0 #ffffff99,inset 0 -3px 6px #2a0f9a88,0 8px 24px #7c5cff66,0 2px 0 #3a1bb8;text-shadow:0 1px 2px #2a0f9a;transition:transform .15s,box-shadow .15s}
+.btn::before{content:"";position:absolute;left:6%;right:6%;top:2px;height:46%;border-radius:999px;background:linear-gradient(180deg,#ffffffaa,#ffffff08)}
+.btn::after{content:"";position:absolute;top:0;left:-70%;width:40%;height:100%;background:linear-gradient(100deg,transparent,#ffffff77,transparent);transform:skewX(-20deg);transition:left .6s}
+.btn:hover{transform:translateY(-2px);box-shadow:inset 0 1px 0 #fff,inset 0 -3px 6px #2a0f9a88,0 14px 32px #7c5cff99,0 2px 0 #3a1bb8}
+.btn:hover::after{left:130%}.btn:active{transform:translateY(1px)}
+.btn:focus-visible{outline:3px solid var(--c);outline-offset:3px}
+.btn.cy{background:linear-gradient(180deg,#7df2ff 0%,#22d3ee 48%,#0891b2 52%,#16b5d6 100%);box-shadow:inset 0 1px 0 #ffffffcc,inset 0 -3px 6px #05506a88,0 8px 24px #22d3ee55,0 2px 0 #0a5f78;text-shadow:0 1px 2px #05506a}
+.btn.pk{background:linear-gradient(180deg,#ff9be9 0%,#ff4fd8 48%,#d11bb0 52%,#f23fcf 100%);box-shadow:inset 0 1px 0 #ffffffcc,inset 0 -3px 6px #7a0a68aa,0 8px 24px #ff4fd855,0 2px 0 #8a0f75;text-shadow:0 1px 2px #7a0a68}
+.btn.sm{padding:9px 20px;font-size:13px}
+.hero{padding:84px 0 56px;text-align:left}
+.tag{display:inline-block;padding:6px 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--c);font-size:13px;margin-bottom:22px}
+h1{font-size:clamp(34px,6vw,64px);font-weight:800;max-width:860px}
+h1 span{background:linear-gradient(90deg,var(--c),var(--v) 50%,var(--m));-webkit-background-clip:text;color:transparent}
+.lead{max-width:640px;color:var(--mu);font-size:18px;margin:22px 0 32px}
+.cta{display:flex;gap:14px;flex-wrap:wrap}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-top:54px}
+.stat{padding:20px;border-radius:18px;background:linear-gradient(160deg,#ffffff14,#ffffff05);border:1px solid var(--line);box-shadow:inset 0 1px 0 #ffffff22}
+.stat b{display:block;font:800 30px Sora;color:#fff}.stat span{color:var(--mu);font-size:14px}
+section{padding:64px 0}
+h2{font-size:clamp(26px,4vw,40px);margin-bottom:12px}
+.sub{color:var(--mu);max-width:640px;margin:0 0 34px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.card{padding:24px;border-radius:20px;background:var(--card);border:1px solid var(--line);box-shadow:inset 0 1px 0 #ffffff22,0 10px 30px #00000040}
+.card h3{font-size:18px;margin-bottom:8px}.card p{margin:0;color:var(--mu);font-size:15px}
+.ico{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:22px;margin-bottom:14px;background:linear-gradient(180deg,#ffffff33,#ffffff0a);border:1px solid var(--line)}
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.step{padding:18px;border-radius:16px;border:1px solid var(--line);background:linear-gradient(180deg,#7c5cff22,#ffffff05);position:relative}
+.step b{font:700 15px Sora;display:block;margin-bottom:6px}.step small{color:var(--mu);font-size:13.5px;line-height:1.5;display:block}
+.demo{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+@media(max-width:800px){.demo{grid-template-columns:1fr}}
+.ctrl{margin-bottom:18px}.ctrl label{display:flex;justify-content:space-between;font-size:14px;color:var(--mu);margin-bottom:6px}.ctrl label b{color:#fff}
+input[type=range]{width:100%;accent-color:var(--v);height:6px}
+.bar{margin-bottom:14px}.bar .r{display:flex;justify-content:space-between;font-size:14px;margin-bottom:5px}
+.track{height:14px;border-radius:99px;background:#ffffff14;overflow:hidden;box-shadow:inset 0 2px 4px #0006}
+.fill{height:100%;border-radius:99px;background:linear-gradient(180deg,#8ff5ff,#22d3ee 50%,#7c5cff);box-shadow:inset 0 1px 0 #fff9;transition:width .45s}
+.best{border-color:#34d39988;box-shadow:0 0 0 1px #34d39955,0 0 30px #34d39933}
+.pill{display:inline-block;padding:3px 10px;border-radius:99px;background:#34d39922;color:var(--g);font-size:12px;margin-left:8px}
+.note{font-size:13px;color:var(--mu);margin-top:14px}
+table{width:100%;border-collapse:collapse;font-size:14.5px}
+th,td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--line)}
+th{font-family:Sora;font-size:13px;color:var(--c)}
+.scroll{overflow-x:auto;border-radius:20px}
+.team{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.av{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;font:800 26px Sora;background:linear-gradient(135deg,var(--v),var(--m));box-shadow:inset 0 2px 0 #fff6,0 8px 24px #7c5cff66}
+.gp{display:flex;flex-direction:column;gap:10px}.chip{align-self:flex-start;padding:3px 11px;border-radius:99px;font-size:12px;font-weight:600;border:1px solid var(--line)}.chip.h{background:#ff4fd822;color:#ff8ae6}.chip.m{background:#22d3ee22;color:var(--c)}.chip.l{background:#34d39922;color:var(--g)}
+.drop{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:16px;margin-bottom:20px;border:2px dashed #ffffff44;border-radius:16px;background:#ffffff08}.drop.on{border-color:var(--c);background:#22d3ee14}.drop small{flex-basis:100%;color:var(--mu);font-size:13px}
+.why{margin-top:18px;padding:14px;border-radius:14px;background:#34d39911;border:1px solid #34d39944;font-size:14px}.why .chip{margin:6px 6px 0 0;display:inline-block}
+.warn{margin-top:10px;padding:10px 14px;border-radius:12px;background:#ffb02022;border:1px solid #ffb02066;color:#ffd58a;font-size:14px}
+.acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.tag{position:relative;padding:8px 18px 8px 34px;border-color:#22d3ee66;background:linear-gradient(180deg,#22d3ee26,#7c5cff1a);box-shadow:inset 0 1px 0 #ffffff33,0 0 24px #22d3ee33;font-weight:500}.tag::before{content:'';position:absolute;left:14px;top:50%;width:9px;height:9px;margin-top:-4.5px;border-radius:50%;background:var(--c);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 #22d3eeaa}70%,100%{box-shadow:0 0 0 10px #22d3ee00}}
+.stat{transition:transform .25s,box-shadow .25s,border-color .25s;cursor:default}.stat:hover,.stat:focus{transform:translateY(-6px) scale(1.02);border-color:#22d3ee88;box-shadow:inset 0 1px 0 #fff3,0 16px 36px #7c5cff55;outline:0}
+.tip{display:block;font-style:normal;font-size:13px;color:var(--c);max-height:0;opacity:0;overflow:hidden;transition:max-height .3s,opacity .3s,margin .3s}.stat:hover .tip,.stat:focus .tip{max-height:80px;opacity:1;margin-top:8px}
+.hud{position:sticky;top:64px;z-index:15;display:flex;gap:10px 22px;align-items:center;flex-wrap:wrap;padding:12px 18px 16px;margin-bottom:18px;border-radius:18px;border:1px solid var(--line);background:#0d1333e6;backdrop-filter:blur(14px);box-shadow:inset 0 1px 0 #ffffff26,0 10px 30px #0008;position:sticky;overflow:hidden}
+.hs small{display:block;font-size:12px;color:var(--mu)}.hs b{font:800 22px Sora;display:inline-block}.hs b.pop{animation:pop .5s}
+@keyframes pop{40%{transform:scale(1.5);color:var(--g)}}
+#hRank{font-size:12px;color:var(--c);margin-left:6px}
+.lvl{position:absolute;left:0;right:0;bottom:0;height:5px;background:#ffffff14}.lvl i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--c),var(--m));transition:width .6s}
+.sw{display:flex;align-items:center;gap:8px;cursor:pointer;margin-left:auto;font-size:13px;color:var(--mu);position:relative}.sw input{position:absolute;opacity:0}
+.kn{width:46px;height:26px;border-radius:99px;background:linear-gradient(180deg,#2b335f,#171c3d);box-shadow:inset 0 2px 4px #000a;position:relative;transition:.25s}.kn::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:linear-gradient(180deg,#fff,#c9d0f5);box-shadow:0 2px 4px #0008;transition:.25s}
+.sw input:checked+.kn{background:linear-gradient(180deg,#a58bff,#5b34e6)}.sw input:checked+.kn::after{left:23px}.sw input:focus-visible+.kn{outline:3px solid var(--c);outline-offset:2px}
+.btn[disabled]{filter:grayscale(.8) brightness(.7);cursor:not-allowed}
+#out{position:relative;overflow:hidden}
+.steps{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}.st{padding:4px 12px;border-radius:99px;font-size:12px;border:1px solid var(--line);color:var(--mu)}.st.on{background:#7c5cff33;color:#fff;border-color:#7c5cff88}
+.scn{padding:12px 14px;margin-bottom:12px;border-radius:14px;background:linear-gradient(135deg,#ff4fd822,#7c5cff22);border:1px solid #ff4fd855}.scn b{display:block;font-family:Sora}.scn span{font-size:14px;color:var(--mu)}
+.prof{margin-bottom:14px}.prof .chip{margin:0 6px 6px 0;display:inline-block}
+.vault{display:flex;gap:14px;align-items:center;padding:18px;border-radius:16px;border:1px dashed #ffffff55;background:repeating-linear-gradient(45deg,#ffffff08 0 10px,#ffffff03 10px 20px);margin-bottom:14px}.vault small{display:block;color:var(--mu)}.lock{font-size:34px}
+.picks{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+.pk8{position:relative;cursor:pointer;color:#fff;font:600 13px Sora;padding:11px 8px;border-radius:12px;border:1px solid var(--line);background:linear-gradient(180deg,#ffffff2e,#ffffff0d 50%,#00000022 52%,#ffffff0d);box-shadow:inset 0 1px 0 #ffffff55,0 4px 10px #0006;transition:transform .15s}.pk8:hover{transform:translateY(-2px)}
+.pk8.sel{background:linear-gradient(180deg,#a58bff,#7c5cff 50%,#5b34e6 52%,#7a4dff);box-shadow:inset 0 1px 0 #fff9,0 0 0 2px var(--c),0 8px 20px #7c5cff77}.pk8:focus-visible{outline:3px solid var(--c)}
+.banner{padding:12px 16px;border-radius:14px;font:700 17px Sora;margin-bottom:14px;background:#ffffff10;animation:unlock .6s both}.banner.win{background:linear-gradient(90deg,#34d39933,#22d3ee33);box-shadow:0 0 30px #34d39944}
+.cmp{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;animation:unlock .6s .15s both}.cc{padding:12px;border-radius:14px;border:1px solid var(--line);background:#ffffff0a}.cc small{display:block;color:var(--mu);font-size:12px}.cc b{display:block;font:700 15px Sora;margin:4px 0}.cc span{font-size:13px;color:var(--c)}.cc.mpk{border-color:#7c5cff99}.cc.gt{border-color:#34d39999}
+.pts{display:flex;align-items:baseline;gap:10px;margin:14px 0;animation:unlock .6s .3s both}.pts b{font:800 28px Sora;color:var(--g)}.pts span{color:var(--mu)}
+.reg{animation:unlock .6s .4s both}.reg .r{display:flex;justify-content:space-between;font-size:14px;margin-bottom:5px}.reg small{color:var(--mu);font-size:12px}
+.why2{font-size:14px;color:var(--mu);animation:unlock .6s .5s both}.why2 b{color:#fff}.truth{animation:unlock .6s .6s both}
+.fill.anim{width:var(--w);animation:grow .9s cubic-bezier(.2,.8,.2,1) both}.fill.good{background:linear-gradient(180deg,#9bffd6,#34d399)}.fill.bad{background:linear-gradient(180deg,#ffd58a,#ff4f6d)}
+@keyframes grow{from{width:0}}@keyframes unlock{from{opacity:0;transform:translateY(14px) scale(.97);filter:blur(6px)}}
+.cf{position:absolute;top:30%;width:8px;height:12px;border-radius:2px;animation:fall 1.5s ease-out forwards;pointer-events:none}@keyframes fall{to{transform:translate(var(--dx),320px) rotate(540deg);opacity:0}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+footer{border-top:1px solid var(--line);padding:30px 0;color:var(--mu);font-size:14px;text-align:center}
+</style>
+</head>
+<body>
+<nav><div class="wrap"><a class="logo" href="#top">Meta<b>Pick</b></a>
+<ul><li><a href="#problem">Problem</a></li><li><a href="#how">Framework</a></li><li><a href="#demo">Live demo</a></li><li><a href="#eval">Evaluation</a></li><li><a href="#gaps">Missing features</a></li><li><a href="#team">Team</a></li></ul>
+<a class="btn sm cy" href="#demo">Try the demo</a></div></nav>
+
+<header class="hero" id="top"><div class="wrap">
+<span class="tag">AI &amp; Machine Learning · Research Project #1</span>
+<h1>Stop guessing. Let the data <span>choose its own algorithm.</span></h1>
+<p class="lead">A meta-learning framework that studies the shape of a tabular dataset and recommends the best classifier in seconds, with no exhaustive trial and error.</p>
+<div class="cta"><a class="btn" href="#demo">Play: Beat the Meta-Model</a><a class="btn pk" href="#how">See the framework</a></div>
+<div class="stats">
+<div class="stat"><b>20+</b><span>meta-features extracted per dataset</span></div>
+<div class="stat"><b>8</b><span>candidate classifiers ranked</span></div>
+<div class="stat"><b>1 pass</b><span>instead of training every model</span></div>
+<div class="stat"><b>Tabular</b><span>structured data, where it matters most</span></div>
+</div></div></header>
+
+<section id="problem"><div class="wrap">
+<h2>The algorithm selection problem</h2>
+<p class="sub">No single classifier wins on every dataset. Picking the right one usually means hours of manual experiments.</p>
+<div class="grid">
+<div class="card"><div class="ico">🎲</div><h3>Trial and error is costly</h3><p>Training and tuning many models on every new dataset burns compute and time.</p></div>
+<div class="card"><div class="ico">🧠</div><h3>Expertise doesn't scale</h3><p>Experienced practitioners pick well from intuition, but beginners and busy teams can't rely on it.</p></div>
+<div class="card"><div class="ico">⚡</div><h3>Meta-learning learns to learn</h3><p>Past results on many datasets teach a model which algorithm fits which kind of data.</p></div>
+</div></div></section>
+
+<section id="how"><div class="wrap">
+<h2>How the framework works</h2>
+<p class="sub">A meta-model is trained once on a large collection of datasets. After that, every new dataset gets a recommendation instantly.</p>
+<div class="flow">
+<div class="step"><b>1. Collect datasets</b><small>Gather many tabular classification benchmarks, such as those on OpenML.</small></div>
+<div class="step"><b>2. Extract meta-features</b><small>Size, class balance, feature types, correlation, entropy, landmarkers.</small></div>
+<div class="step"><b>3. Run algorithms</b><small>Cross-validate candidate classifiers and record each score.</small></div>
+<div class="step"><b>4. Train meta-model</b><small>Learn the link between dataset traits and the best-performing algorithm.</small></div>
+<div class="step"><b>5. Recommend</b><small>For a new dataset, output a ranked list of algorithms.</small></div>
+</div></div></section>
+
+<section id="demo"><div class="wrap">
+<h2>Beat the Meta-Model</h2>
+<p class="sub">Get a dataset, guess the winning classifier, then see if you can out-predict MetaPick. Switch off Game mode for instant live updates.</p>
+<div class='hud' id='hud'><div class='hs'><small>ML Intuition Score<span id='hRank'>Rookie</span></small><b id='hScore'>0</b></div><div class='hs'><small>Win Streak</small><b id='hStreak'>0</b></div><div class='hs'><small>Beat MetaPick</small><b id='hBeat'>0</b></div><div class='hs'><small>Round</small><b id='hRound'>1</b></div><label class='sw'><input type='checkbox' id='gm' checked><span class='kn'></span><em id='gml' style='font-style:normal'>Game mode</em></label><div class='lvl'><i id='lvl'></i></div></div>
+<div class="demo">
+<div class="card">
+<div class='drop' id='drop'><b>Drop a CSV here</b><span>or</span><button class='btn pk sm' id='pick'>Choose file</button><input type='file' id='file' accept='.csv,text/csv' hidden><small id='dmsg'>Runs in your browser. Nothing is uploaded. The last column is treated as the target.</small></div>
+<div class="ctrl"><label>Rows <b id="vr">10,000</b></label><input id="r" type="range" min="2" max="6" step="0.1" value="4"></div>
+<div class="ctrl"><label>Features <b id="vf">30</b></label><input id="f" type="range" min="0" max="3" step="0.05" value="1.5"></div>
+<div class="ctrl"><label>Categorical features <b id="vc">40%</b></label><input id="c" type="range" min="0" max="100" value="40"></div>
+<div class="ctrl"><label>Class imbalance <b id="vi">20%</b></label><input id="i" type="range" min="0" max="95" value="20"></div>
+<div class="ctrl"><label>Noise level <b id="vn">30%</b></label><input id="n" type="range" min="0" max="100" value="30"></div>
+<div class='ctrl'><label>Missing values <b id='vm'>0%</b></label><input id='m' type='range' min='0' max='90' value='0'></div>
+<button class='btn' id='deal'>Deal Mystery Dataset</button> <button class="btn cy" id="rnd">Randomize dataset</button>
+</div>
+<div class="card" id="out"></div>
+</div>
+<p class="note">Illustrative demo based on common rules of thumb. The full framework replaces these rules with a meta-model trained on real benchmark results. In Game mode, the ground-truth winner comes from a simulated benchmark, not real experiments.</p>
+</div></section>
+
+<section id="eval"><div class="wrap">
+<h2>Candidate algorithms and evaluation plan</h2>
+<p class="sub">The framework ranks these classifiers and is judged on how often its top picks match the true best.</p>
+<div class="scroll card" style="padding:6px"><table>
+<tr><th>Algorithm</th><th>Strong when</th><th>Weak when</th></tr>
+<tr><td>Random Forest</td><td>Mixed features, noise</td><td>Very high dimensions</td></tr>
+<tr><td>Gradient Boosting (XGBoost / LightGBM)</td><td>Medium to large tabular data</td><td>Tiny or very noisy data</td></tr>
+<tr><td>Logistic Regression</td><td>Linear patterns, small data</td><td>Complex interactions</td></tr>
+<tr><td>SVM</td><td>Small to medium, numeric data</td><td>Huge datasets</td></tr>
+<tr><td>k-Nearest Neighbors</td><td>Small, clean, low dimension</td><td>Many features</td></tr>
+<tr><td>Naive Bayes</td><td>Tiny data, many categories</td><td>Correlated features</td></tr>
+<tr><td>Decision Tree</td><td>Interpretability needed</td><td>Overfits easily</td></tr>
+<tr><td>MLP Neural Network</td><td>Large numeric data</td><td>Small data</td></tr>
+</table></div>
+<div class="grid" style="margin-top:18px">
+<div class="card"><h3>Top-k accuracy</h3><p>How often the truly best algorithm appears in the top 1, 3 and 5 recommendations.</p></div>
+<div class="card"><h3>Performance regret</h3><p>The gap between the recommended model's score and the best model's score.</p></div>
+<div class="card"><h3>Time saved</h3><p>Compute cost versus brute-force search across all candidates.</p></div>
+</div></div></section>
+
+<section id="gaps"><div class="wrap">
+<h2>Missing features and next steps</h2>
+<p class="sub">What this first version does not do yet, and how the full framework will close each gap.</p>
+<div class="grid">
+<div class="card gp"><span class="chip h">High priority</span><h3>Trained meta-model</h3><p>The demo uses hand-written rules. The real system needs a meta-model trained on hundreds of benchmark datasets.</p></div>
+<div class="card gp"><span class="chip l">Added</span><h3>Upload your own CSV</h3><p>The demo now reads a CSV in your browser and fills the sliders from its profile.</p></div>
+<div class="card gp"><span class="chip h">High priority</span><h3>Real benchmark results</h3><p>No measured accuracy, top-k or regret numbers are shown yet. These come from cross-validated experiments.</p></div>
+<div class="card gp"><span class="chip m">Medium</span><h3>Missing-value handling</h3><p>Meta-features for datasets with many missing values, plus built-in imputation advice, are not covered.</p></div>
+<div class="card gp"><span class="chip m">Medium</span><h3>Hyperparameter suggestions</h3><p>It recommends the algorithm only. It does not yet suggest settings such as tree depth or learning rate.</p></div>
+<div class="card gp"><span class="chip m">Medium</span><h3>Explainable recommendations</h3><p>Users should see which dataset traits drove each pick, for example with SHAP.</p></div>
+<div class="card gp"><span class="chip l">Later</span><h3>Landmarking features</h3><p>Fast, simple models can run on a data sample to add stronger meta-features.</p></div>
+<div class="card gp"><span class="chip l">Later</span><h3>Compare with AutoML</h3><p>Benchmark the framework against brute-force search and tools such as Auto-sklearn or FLAML.</p></div>
+<div class="card gp"><span class="chip l">Later</span><h3>Regression and multi-label tasks</h3><p>The scope is tabular classification only. Other task types are future work.</p></div>
+</div></div></section>
+
+<section id="team"><div class="wrap">
+<h2>Project team</h2>
+<div class="card team" style="margin-top:20px"><div class="av">SK</div>
+<div><h3>Sreekar Karthikeya</h3><p style="margin:4px 0 14px;color:var(--mu)">Student researcher · Domain: AI &amp; Machine Learning</p>
+<a class="btn pk sm" href="#top">Back to top</a></div></div>
+</div></section>
+
+<footer><div class="wrap">Meta-Learning-Based Algorithm Selection Framework for Tabular Classification Tasks</div></footer>
+
+<script>
+const $=id=>document.getElementById(id);
+const A=["Random Forest","Gradient Boosting","Logistic Regression","SVM","k-Nearest Neighbors","Naive Bayes","Decision Tree","MLP Neural Net"];
+const fmt=n=>Math.round(n).toLocaleString("en-US");
+const NL=String.fromCharCode(10),QT=String.fromCharCode(34);let LAST=null;
+const TR={'Random Forest':'Robust to noise and mixed types; slower on huge, wide data.','Gradient Boosting':'Top accuracy on medium to large tabular data; needs tuning and clean labels.','Logistic Regression':'Fast, interpretable baseline; misses complex interactions.','SVM':'Strong on small numeric data; slow on large datasets.','k-Nearest Neighbors':'Simple and non-parametric; struggles with many features.','Naive Bayes':'Very fast on tiny data; assumes independent features.','Decision Tree':'Fully interpretable; overfits easily.','MLP Neural Net':'Flexible on large numeric data; needs scaling and more data.'};
+const MOD={RandomForestClassifier:'sklearn.ensemble',HistGradientBoostingClassifier:'sklearn.ensemble',LogisticRegression:'sklearn.linear_model',SVC:'sklearn.svm',KNeighborsClassifier:'sklearn.neighbors',GaussianNB:'sklearn.naive_bayes',DecisionTreeClassifier:'sklearn.tree',MLPClassifier:'sklearn.neural_network'};
+function mk(n,b){const w=b?`, class_weight='balanced'`:'';return {'Random Forest':['RandomForestClassifier',`n_estimators=300, n_jobs=-1, random_state=42${w}`],'Gradient Boosting':['HistGradientBoostingClassifier',`random_state=42${w}`],'Logistic Regression':['LogisticRegression',`max_iter=1000${w}`],'SVM':['SVC',`probability=True${w}`],'k-Nearest Neighbors':['KNeighborsClassifier','n_neighbors=7'],'Naive Bayes':['GaussianNB',''],'Decision Tree':['DecisionTreeClassifier',`max_depth=8, random_state=42${w}`],'MLP Neural Net':['MLPClassifier','hidden_layer_sizes=(64, 32), early_stopping=True, random_state=42']}[n]}
+function code(t){const b=t.imb>.4,[c,a]=mk(t.o[0].n,b);return [`import pandas as pd`,`from ${MOD[c]} import ${c}`,`from sklearn.compose import make_column_transformer, make_column_selector as sel`,`from sklearn.impute import SimpleImputer`,`from sklearn.model_selection import cross_val_score, StratifiedKFold`,`from sklearn.pipeline import make_pipeline`,`from sklearn.preprocessing import OneHotEncoder, StandardScaler`,``,`df = pd.read_csv('data.csv')`,`X, y = df.drop(columns='target'), df['target']`,``,`num = make_pipeline(SimpleImputer(strategy='median'), StandardScaler())`,`cat = make_pipeline(SimpleImputer(strategy='most_frequent'), OneHotEncoder(handle_unknown='ignore', sparse_output=False))`,`pre = make_column_transformer((num, sel(dtype_include='number')), (cat, sel(dtype_exclude='number')))`,`model = make_pipeline(pre, ${c}(${a}))`,``,`cv = StratifiedKFold(5, shuffle=True, random_state=42)`,`scoring = '${b?'f1_macro':'accuracy'}'`,`print(cross_val_score(model, X, y, cv=cv, scoring=scoring).mean())`].join(NL)}
+function extras(t){$('vm').textContent=Math.round(t.miss*100)+'%';const top=t.o[0].n,why=[],W=[];
+if(t.big>.6)why.push('large dataset');if(t.small>.6)why.push('small dataset');if(t.cat>.5)why.push('many categorical features');if(t.cat<.2)why.push('mostly numeric features');if(t.noi>.6)why.push('high noise');if(t.noi<.25)why.push('low noise');if(t.wide>.6)why.push('many features');if(t.imb>.5)why.push('class imbalance');if(!why.length)why.push('balanced mix of traits');
+if(t.imb>.6)W.push('High class imbalance detected. Consider SMOTE or class weights, and judge models with F1 or PR-AUC instead of accuracy.');
+if(t.rows<500)W.push('Very few rows. Scores will vary a lot, so use repeated cross-validation.');
+if(t.feat>t.rows/2)W.push('Features outnumber half the rows. Overfitting risk: use regularization or feature selection.');
+if(t.noi>.7)W.push('High noise. Prefer ensembles and regularized models.');
+if(t.miss>.2)W.push('Over 20% missing values. Compare imputation strategies; boosting handles gaps natively.');
+if(t.big>.8&&(top==='SVM'||top==='k-Nearest Neighbors'))W.push(top+' gets slow on very large data. Consider sampling.');
+LAST={t,why,W};
+return `<div class='why'><b>Why ${top}?</b><br>${why.map(x=>`<span class='chip m'>${x}</span>`).join('')}</div>`+W.map(x=>`<div class='warn'>Warning: ${x}</div>`).join('')+`<div class='acts'><button class='btn cy sm' data-copy='code'>Copy Python code</button><button class='btn sm' data-copy='md'>Copy report</button><button class='btn pk sm' data-copy='json'>Copy JSON</button></div>`}
+function rep(){const t=LAST.t,p=x=>Math.round(x*100)+'%';return {md:['# Algorithm recommendation','','## Dataset profile',`- Rows: ${fmt(t.rows)}`,`- Features: ${fmt(t.feat)}`,`- Categorical: ${p(t.cat)}`,`- Missing values: ${p(t.miss)}`,`- Class imbalance: ${p(t.imb)}`,`- Noise: ${p(t.noi)}`,'','## Ranked models',...t.o.slice(0,5).map((e,k)=>`${k+1}. ${e.n} (${(e.v*100).toFixed(1)}% fit): ${TR[e.n]}`),'','## Why '+t.o[0].n,LAST.why.join(', '),'','## Warnings',...(LAST.W.length?LAST.W.map(x=>'- '+x):['- None']),'','Generated by the MetaPick demo (rule-based estimate).'].join(NL),json:JSON.stringify({profile:{rows:Math.round(t.rows),features:Math.round(t.feat),categorical:+t.cat.toFixed(2),missing:+t.miss.toFixed(2),imbalance:+t.imb.toFixed(2),noise:+t.noi.toFixed(2)},ranking:t.o.slice(0,5).map(e=>({algorithm:e.n,fit:+e.v.toFixed(3),tradeoff:TR[e.n]})),why:LAST.why,warnings:LAST.W},null,2)}}
+function copy(txt,b){const l=b.dataset.l||b.textContent;b.dataset.l=l;const ok=()=>{b.textContent='Copied!';setTimeout(()=>b.textContent=l,1400)};const fb=()=>{const a=document.createElement('textarea');a.value=txt;document.body.appendChild(a);a.select();try{document.execCommand('copy');ok()}catch(e){b.textContent='Copy blocked'}a.remove()};try{navigator.clipboard.writeText(txt).then(ok,fb)}catch(e){fb()}}
+$('out').addEventListener('click',e=>{const b=e.target.closest('[data-copy]');if(!b||!LAST)return;const k=b.dataset.copy;copy(k==='code'?code(LAST.t):rep()[k],b)});
+function parseCSV(x){const R=[];let r=[],f='',q=false;for(let i=0;i<x.length;i++){const c=x[i];if(q){if(c===QT){if(x[i+1]===QT){f+=QT;i++}else q=false}else f+=c}else if(c===QT)q=true;else if(c===','){r.push(f);f=''}else if(c===NL){r.push(f);R.push(r);r=[];f=''}else if(c!==String.fromCharCode(13))f+=c}if(f!==''||r.length){r.push(f);R.push(r)}return R}
+function analyze(x){const all=parseCSV(x).filter(r=>r.length>1),msg=$('dmsg');if(all.length<3){msg.textContent='Could not read this file. Use a comma-separated CSV with a header row and at least 2 rows.';return}
+const h=all[0],d=all.slice(1),n=d.length,cols=h.length;let nu=0,ca=0,mi=0,ce=0;
+for(let j=0;j<cols-1;j++){let nn=0,ne=0;for(const r of d){const v=(r[j]||'').trim();ce++;if(v===''||/^(nan|na|null)$/i.test(v)){mi++;continue}ne++;if(!isNaN(+v))nn++}if(ne&&nn/ne>=.9)nu++;else ca++}
+const cnt={};for(const r of d){const v=(r[cols-1]||'').trim();if(v!=='')cnt[v]=(cnt[v]||0)+1}const cv=Object.values(cnt),imb=cv.length>1?1-Math.min(...cv)/Math.max(...cv):0,cl=(v,a,b)=>Math.max(a,Math.min(b,v));
+$('r').value=cl(Math.log10(n),2,6);$('f').value=cl(Math.log10(Math.max(1,cols-1)),0,3);$('c').value=Math.round(ca/Math.max(1,nu+ca)*100);$('i').value=Math.min(95,Math.round(imb*100));$('m').value=Math.min(90,Math.round(mi/Math.max(1,ce)*100));
+msg.textContent=`Loaded ${fmt(n)} rows, ${cols-1} features (${nu} numeric, ${ca} categorical), ${(mi/Math.max(1,ce)*100).toFixed(1)}% missing, ${cv.length} classes. Sliders updated.`;calc()}
+function load(f){if(!f)return;GM.scn=null;const rd=new FileReader();rd.onload=()=>analyze(String(rd.result));rd.readAsText(f.slice(0,20000000))}
+const dz=$('drop');['dragenter','dragover'].forEach(v=>dz.addEventListener(v,e=>{e.preventDefault();dz.classList.add('on')}));['dragleave','drop'].forEach(v=>dz.addEventListener(v,e=>{e.preventDefault();dz.classList.remove('on')}));dz.addEventListener('drop',e=>load(e.dataTransfer.files[0]));$('pick').onclick=()=>$('file').click();$('file').onchange=e=>load(e.target.files[0]);
+let GM={on:true,phase:'guess',guess:null,score:0,streak:0,beats:0,round:1,scn:null,last:-1,done:null};
+const SC=[['Hospital Readmission','50k rows, 80% missing lab values, 2% positive class',4.7,1.8,35,95,55,80],['Credit Card Fraud','280k transactions, 30 numeric features, 0.2% fraud',5.45,1.5,5,95,25,0],['Customer Churn','7k customers, 60% categorical features, 1 in 4 churn',3.85,1.3,60,70,40,5],['Tiny Clinical Trial','250 patients, noisy labels, 10% missing values',2.4,1.1,20,30,60,10],['Gene Expression','400 samples, 2,000 features, no categories',2.6,3,0,20,50,2],['Loan Default','120k loans, mixed types, 20% missing income data',5.1,1.65,50,85,35,20],['Clean Lab Measurements','1.5k rows, 8 clean numeric features, balanced classes',3.2,.9,0,5,5,0]];
+const TIPS=['Size, balance, feature types, correlation, entropy and landmarkers.','Forest, boosting, regression, SVM, kNN, Bayes, tree and neural net.','One meta-model pass replaces training every candidate.','Rows and columns: where boosted trees and forests shine.'];
+document.querySelectorAll('.stat').forEach((e,k)=>{e.tabIndex=0;e.insertAdjacentHTML('beforeend',`<i class='tip'>${TIPS[k]}</i>`)});
+function dealRound(){if(GM.phase==='done')GM.round++;let k;do{k=Math.floor(Math.random()*SC.length)}while(k===GM.last);GM.last=k;const s=SC[k];['r','f','c','i','n','m'].forEach((id,j)=>$(id).value=s[j+2]);GM.scn=s;$('dmsg').textContent=`Dealt: ${s[0]}. ${s[1]}.`;calc()}
+function rng(t){let h=2166136261;for(const x of [t.rows,t.feat,t.cat,t.imb,t.noi,t.miss].map(v=>Math.round(v*100)))h=Math.imul(h^x,16777619);return()=>{h+=0x6D2B79F5;let a=Math.imul(h^h>>>15,1|h);a=a+Math.imul(a^a>>>7,61|a)^a;return((a^a>>>14)>>>0)/4294967296}}
+function game(t){const R=rng(t),tr=t.s.map(v=>Math.max(.3,Math.min(.98,v+(R()-.5)*.09)));GM.t=t;GM.tr=tr;GM.ord=tr.map((v,k)=>k).sort((a,b)=>tr[b]-tr[a]);GM.mp=t.s.indexOf(Math.max(...t.s));GM.phase='guess';GM.guess=null;GM.done=null;draw()}
+function hudUp(pop){const S=GM.score,L=[[0,'Rookie'],[100,'Analyst'],[300,'Data Scientist'],[600,'Meta-Learner']];let i=0;L.forEach((x,k)=>{if(S>=x[0])i=k});const nx=L[i+1],pr=nx?(S-L[i][0])/(nx[0]-L[i][0]):1;$('hScore').textContent=S;$('hRank').textContent=L[i][1];$('hStreak').textContent=GM.streak;$('hBeat').textContent=GM.beats;$('hRound').textContent=GM.round;$('lvl').style.width=Math.round(pr*100)+'%';if(pop)['hScore','hStreak','hBeat'].forEach(id=>{const e=$(id);e.classList.remove('pop');void e.offsetWidth;e.classList.add('pop')})}
+function steps(n){return `<div class='steps'>${['1 Dataset','2 Your guess','3 Reveal'].map((x,k)=>`<span class='st${k<n?' on':''}'>${x}</span>`).join('')}</div>`}
+function scnCard(){return GM.scn?`<div class='scn'><b>${GM.scn[0]}</b><span>${GM.scn[1]}</span></div>`:''}
+function profile(t){const p=x=>Math.round(x*100)+'%';return `<div class='prof'>${[['Rows',fmt(t.rows)],['Features',fmt(t.feat)],['Categorical',p(t.cat)],['Imbalance',p(t.imb)],['Noise',p(t.noi)],['Missing',p(t.miss)]].map(x=>`<span class='chip m'>${x[0]} <b>${x[1]}</b></span>`).join('')}</div>`}
+function draw(){const t=GM.t,el=$('out');
+if(GM.phase==='guess'){el.innerHTML=steps(2)+scnCard()+profile(t)+`<div class='vault'><div class='lock'>🔒</div><div><b>MetaPick Analysis Vault</b><small>Locked. Lock in your guess for the #1 classifier to open it.</small></div></div><div class='picks'>${A.map((n,k)=>`<button class='pk8${GM.guess===k?' sel':''}' data-pick='${k}'>${n}</button>`).join('')}</div><div class='acts'><button class='btn' id='lock' ${GM.guess===null?'disabled':''}>Lock in my guess</button></div>`;return}
+const d=GM.done,tr=GM.tr,pc=v=>(v*100).toFixed(1)+'%',reg=(tr[d.gt]-tr[d.g])*100,mreg=(tr[d.gt]-tr[GM.mp])*100,opt=reg<.05;
+const msg=d.beat?'You beat MetaPick! 🏆':d.pts===100?'Perfect read. You found the winner. 🎯':d.same?'You matched MetaPick. 🤝':d.pts?'Solid call. Top-3 finish.':'Missed this one. See the reasons below.';
+const why=(LAST?LAST.why:[]).slice(0,2).join(' and ');
+el.innerHTML=steps(3)+scnCard()+`<div class='banner ${d.beat||d.pts===100?'win':''}'>${msg}</div><div class='cmp'><div class='cc'><small>Your pick</small><b>${A[d.g]}</b><span>${pc(tr[d.g])} accuracy</span></div><div class='cc mpk'><small>MetaPick #1 pick</small><b>${A[GM.mp]}</b><span>${pc(tr[GM.mp])} accuracy</span></div><div class='cc gt'><small>Ground-truth winner</small><b>${A[d.gt]}</b><span>${pc(tr[d.gt])} accuracy</span></div></div><div class='pts'><b>+${d.pts} pts</b><span>${d.pts===100?'Top-1 match':d.pts===50?'Top-3 match':'Outside Top-3'}</span></div><div class='reg'><div class='r'><span>Performance regret</span><b>${opt?'0.0%, optimal':'-'+reg.toFixed(1)+'% accuracy'}</b></div><div class='track'><div class='fill anim ${opt?'good':'bad'}' style='--w:${opt?100:Math.max(6,Math.min(100,reg/12*100))}%'></div></div><small>MetaPick regret on this dataset: ${mreg<.05?'0.0%':mreg.toFixed(1)+'%'}</small></div><p class='why2'><b>Why:</b> ${A[d.gt]} wins because of ${why||'the overall dataset mix'}. ${TR[A[d.gt]]}</p><div class='truth'><small class='note'>Simulated benchmark accuracy</small>${GM.ord.map((k,i)=>`<div class='bar'><div class='r'><span>${A[k]}${k===d.g?` <span class='pill'>You</span>`:''}${k===GM.mp?` <span class='pill'>MetaPick</span>`:''}</span><b>${pc(tr[k])}</b></div><div class='track'><div class='fill anim' style='--w:${tr[k]*100}%;animation-delay:${i*70}ms'></div></div></div>`).join('')}</div><div class='acts'><button class='btn' id='next'>Next round</button><button class='btn cy' id='sand'>Sandbox mode</button></div>`}
+function reveal(){const g=GM.guess,{tr,ord,mp}=GM,gt=ord[0],pts=g===gt?100:ord.slice(0,3).includes(g)?50:0,beat=tr[g]>tr[mp]+.0005;GM.score+=pts;GM.streak=(pts>=50||beat)?GM.streak+1:0;if(beat)GM.beats++;GM.phase='done';GM.done={pts,beat,same:g===mp,g,gt};hudUp(true);draw();if(beat||g===mp||pts===100)burst()}
+function burst(){const el=$('out');for(let i=0;i<30;i++){const c=document.createElement('i');c.className='cf';c.style.cssText=`left:${Math.random()*100}%;background:hsl(${Math.random()*360} 90% 62%);--dx:${(Math.random()-.5)*160}px;animation-delay:${Math.random()*.25}s`;el.appendChild(c);setTimeout(()=>c.remove(),1900)}}
+$('out').addEventListener('click',e=>{const p=e.target.closest('[data-pick]');if(p&&GM.on&&GM.phase==='guess'){GM.guess=+p.dataset.pick;document.querySelectorAll('.pk8').forEach(b=>b.classList.toggle('sel',b===p));const l=$('lock');if(l)l.disabled=false;return}if(e.target.closest('#lock')&&GM.guess!==null)return reveal();if(e.target.closest('#next'))return dealRound();if(e.target.closest('#sand')){$('gm').checked=false;$('gm').dispatchEvent(new Event('change'))}});
+$('gm').addEventListener('change',e=>{GM.on=e.target.checked;$('gml').textContent=GM.on?'Game mode':'Sandbox mode';calc()});
+['r','f','c','i','n','m'].forEach(id=>$(id).addEventListener('input',()=>{GM.scn=null}));
+$('deal').onclick=dealRound;hudUp(false);
+function calc(){
+ const rows=Math.pow(10,+$("r").value),feat=Math.pow(10,+$("f").value),cat=+$("c").value/100,imb=+$("i").value/100,noi=+$("n").value/100;
+ $("vr").textContent=fmt(rows);$("vf").textContent=fmt(feat);$("vc").textContent=Math.round(cat*100)+"%";$("vi").textContent=Math.round(imb*100)+"%";$("vn").textContent=Math.round(noi*100)+"%";
+ const big=Math.min(1,Math.max(0,(Math.log10(rows)-2)/4)),wide=Math.min(1,Math.log10(feat)/3),small=1-big;
+ const s=[
+  .72+.1*cat+.08*noi-.05*wide,
+  .70+.16*big+.1*cat-.1*noi*small+.04*imb,
+  .60+.1*small+.1*wide-.12*cat-.04*noi,
+  .62+.08*small-.15*big+.05*wide-.1*cat,
+  .55+.05*small-.18*wide-.1*cat-.1*noi,
+  .52+.1*small+.08*cat+.04*wide-.04*imb,
+  .50+.05*cat-.08*noi,
+  .54+.15*big-.12*small-.1*cat-.05*noi
+ ].map(x=>Math.max(.3,Math.min(.97,x)));
+ const M=+$('m').value/100,adj=[.03,.06,-.08,-.1,-.12,-.04,.02,-.1];s.forEach((x,k)=>s[k]=Math.max(.3,Math.min(.97,x+adj[k]*M)));
+ const o=A.map((n,k)=>({n,v:s[k]})).sort((a,b)=>b.v-a.v);
+ const X=extras({rows,feat,cat,imb,noi,big,small,wide,miss:+$('m').value/100,o});
+ $("out").innerHTML="<h3 style='margin-bottom:16px'>Recommended ranking</h3>"+o.slice(0,5).map((e,k)=>
+  `<div class="bar"><div class="r"><span>${e.n}${k?"":'<span class="pill">Best match</span>'}</span><b>${(e.v*100).toFixed(1)}%</b></div><div class="track"><div class="fill" style="width:${e.v*100}%"></div></div></div>`).join("")+
+  `<p class="note">Predicted score is a relative fit estimate, not a measured accuracy.</p>`+X;if(GM.on)game({rows,feat,cat,imb,noi,big,small,wide,miss:M,o,s});
+}
+document.querySelectorAll("input[type=range]").forEach(e=>e.addEventListener("input",calc));
+$("rnd").onclick=()=>{[["r",2,6],["f",0,3],["c",0,100],["i",0,95],["n",0,100]].forEach(([id,a,b])=>$(id).value=a+Math.random()*(b-a));GM.scn=null;calc()};
+calc();
+</script>
+</body>
+</html>
